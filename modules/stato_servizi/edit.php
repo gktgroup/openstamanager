@@ -63,6 +63,13 @@ if (Services::isEnabled()) {
                             <td>'.dateFormat($scadenza).' ('.$scadenza->diffForHumans().')</td>
                         </tr>';
         }
+        // Gestione per crediti
+        elseif (
+            (isset($servizio['credits']) && $servizio['credits'] < 100)
+        ) {
+            $servizi_in_scadenza[] = $servizio['name'].' ('.$servizio['credits'].' crediti)';
+        }
+    }
 
         echo '
                     </tbody>
