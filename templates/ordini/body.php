@@ -163,7 +163,7 @@ foreach ($righe as $riga) {
 
         echo '
             <td class="text-center">
-                '.Translator::numberToLocale(abs($qta), 'qta').' '.$um.'
+                '.numberFormat(abs($qta), 'qta').' '.$um.'
             </td>';
 
         if ($options['pricing']) {
@@ -193,7 +193,7 @@ foreach ($righe as $riga) {
             // Iva
             echo '
             <td class="text-center">
-                '.Translator::numberToLocale($riga->aliquota->percentuale, 0).'
+                '.numberFormat($riga->aliquota->percentuale, 0).'
             </td>';
         }
 
