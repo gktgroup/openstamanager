@@ -19,7 +19,6 @@
 
 namespace Plugins\ImportFE;
 
-use Modules;
 use Modules\Anagrafiche\Anagrafica;
 use Modules\Banche\Banca;
 use Modules\Anagrafiche\Nazione;
