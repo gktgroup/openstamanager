@@ -23,7 +23,6 @@
  * @since 2.3
  */
 
-use App\Exceptions\LegacyRedirectException;
 use HTMLBuilder\HTMLBuilder;
 use Models\OperationLog;
 
@@ -239,23 +238,6 @@ function translateTemplate($template)
         OperationLog::build($op);
     }
 
-    // Retrocompatibilità
-    if (!empty($_SESSION['infos'])) {
-        foreach ($_SESSION['infos'] as $message) {
-            flash()->info($message);
-        }
-    }
-    if (!empty($_SESSION['warnings'])) {
-        foreach ($_SESSION['warnings'] as $message) {
-            flash()->warning($message);
-        }
-    }
-    if (!empty($_SESSION['errors'])) {
-        foreach ($_SESSION['errors'] as $message) {
-            flash()->error($message);
-        }
-    }
-
     // Annullo le notifiche (AJAX)
     if (isAjaxRequest()) {
         //flash()->clearMessage('info');
@@ -314,7 +296,7 @@ function redirectOperation($id_module, $id_record)
             redirect_legacy(base_url().'/controller.php?id_module='.$id_module.$hash);
         }
 
-        throw new \App\Exceptions\LegacyExitException();
+        throw new \LegacyExitException();
     }
 }
 
@@ -425,7 +407,7 @@ function base_url()
  */
 function base_dir()
 {
-    return base_path().DIRECTORY_SEPARATOR.'legacy'.DIRECTORY_SEPARATOR;
+    return realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR);
 }
 
 /**

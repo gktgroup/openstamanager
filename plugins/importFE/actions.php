@@ -46,7 +46,7 @@ switch (filter('op')) {
             echo json_encode([
                 'id' => 1,
             ]);
-            throw new \App\Exceptions\LegacyExitException();
+            throw new \LegacyExitException();
         } else {
             $content = file_get_contents($temp_name);
 
