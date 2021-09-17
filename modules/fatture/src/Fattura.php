@@ -428,14 +428,15 @@ class Fattura extends Document
         return $this->hasOne(Components\Riga::class, 'iddocumento')->where('id', $this->id_riga_bollo);
     }
 
-    public function gruppoScadenze()
+    public function getGruppoScadenze()
     {
-        return $this->hasOne(Gruppo::class, 'id_documento');
+        return $this->gestoreScadenze->getGruppo();
     }
 
     public function scadenze()
     {
-        return $this->gruppoScadenze->scadenze()
+        return $this->getGruppoScadenze()
+            ->scadenze()
             ->orderBy('scadenza');
     }
 
@@ -588,7 +589,7 @@ class Fattura extends Document
             && !in_array($this->stato['descrizione'], ['Bozza', 'Annullata'])
         ) {
             // Correzione descrizione per Gruppo Scadenze di riferimento
-            $gruppo = $this->gruppoScadenze;
+            $gruppo = $this->gestoreScadenze->getGruppo();
             $gruppo->descrizione = $this->getReference();
             $gruppo->save();
 
