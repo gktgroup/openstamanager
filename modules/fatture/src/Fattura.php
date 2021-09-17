@@ -204,6 +204,9 @@ class Fattura extends Document
 
         $model->save();
 
+        // Inizializzazione Gruppo Scadenze di riferimento
+        $model->gestoreScadenze->getGruppo();
+
         return $model;
     }
 
@@ -584,6 +587,11 @@ class Fattura extends Document
             in_array($stato_precedente->descrizione, ['Bozza', 'Annullata'])
             && !in_array($this->stato['descrizione'], ['Bozza', 'Annullata'])
         ) {
+            // Correzione descrizione per Gruppo Scadenze di riferimento
+            $gruppo = $this->gruppoScadenze;
+            $gruppo->descrizione = $this->getReference();
+            $gruppo->save();
+
             // Registrazione scadenze
             $this->registraScadenze($this->stato['descrizione'] == 'Pagato');
 
@@ -623,7 +631,7 @@ class Fattura extends Document
         $result = parent::delete();
 
         // Rimozione delle scadenza
-        $this->rimuoviScadenze();
+        $this->gruppoScadenze()->delete();
 
         // Rimozione dei movimenti
         $this->gestoreMovimenti->rimuovi();
