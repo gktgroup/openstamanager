@@ -100,7 +100,7 @@ function loadSize(number, id){
 
     $.ajax({
         url: globals.rootdir + "/actions.php",
-        type: "get",
+        type: "GET",
         data: {
             id_module: globals.id_module,
             op: "size",
