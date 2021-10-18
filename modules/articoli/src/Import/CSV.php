@@ -341,7 +341,7 @@ class CSV extends CSVImporter
                     'name' => 'Immagine',
                     'category' => 'Immagini',
                     'original_name' => $name,
-                    'id_module' => Modules::get('Articoli')['id'],
+                    'id_module' => module('Articoli')['id'],
                     'id_record' => $articolo->id,
                 ], [
                     'thumbnails' => true,

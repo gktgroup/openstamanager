@@ -192,7 +192,7 @@ echo '
                     <span class="info-box-icon bg-'.($fatture_vendita->count()+$note_credito->count() == 0 ? 'gray' : 'green').'"><i class="fa fa-money"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text pull-left">'.tr('Fatture').'</span>
-                        '.($fatture_vendita->count()+$note_credito->count() > 0 ? '<span class="info-box-text pull-right"><a href="'.base_url().'/controller.php?id_module='.Modules::get('Fatture di vendita')['id'].'&search_Ragione-sociale='.rawurlencode($anagrafica['ragione_sociale']).'">'.tr('Visualizza').' <i class="fa fa-chevron-circle-right"></i></a></span>' : '').'
+                        '.($fatture_vendita->count()+$note_credito->count() > 0 ? '<span class="info-box-text pull-right"><a href="'.base_url().'/controller.php?id_module='.module('Fatture di vendita')['id'].'&search_Ragione-sociale='.rawurlencode($anagrafica['ragione_sociale']).'">'.tr('Visualizza').' <i class="fa fa-chevron-circle-right"></i></a></span>' : '').'
                         <br class="clearfix">
                         <span class="info-box-number">
                             <big>'.($fatture_vendita->count()+$note_credito->count()).'</big><br>
