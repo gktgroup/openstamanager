@@ -36,7 +36,7 @@ if (get('download') == '1') {
     header('Content-disposition: attachment; filename="'.basename($file->original_name).'"');
     readfile(base_dir().'/'.$file->filepath);
     //download(base_dir().'/'.$file->filepath, basename($file->original_name));
-    exit();
+    throw new \LegacyExitException();;
 }
 
 if ($file->isFatturaElettronica()) {

@@ -43,7 +43,7 @@ switch (filter('op')) {
         // Redirect alla categoria se si sta modificando una sottocategoria
         $database->commitTransaction();
         redirect(base_path().'/editor.php?id_module='.$id_module.'&id_record='.($id_original ?: $id_record));
-        exit();
+        throw new \LegacyExitException();;
 
         break;
 
@@ -86,7 +86,7 @@ switch (filter('op')) {
             // Redirect alla categoria se si sta aggiungendo una sottocategoria
             $database->commitTransaction();
             redirect(base_path().'/editor.php?id_module='.$id_module.'&id_record='.($id_original ?: $id_record));
-            exit();
+            throw new \LegacyExitException();;
         }
 
         break;

@@ -137,7 +137,7 @@ echo '
                                     <i class="fa fa-external-link"></i> '.$file->name.'
                                 </a>
                             </td>
-                            <td>'.Modules::link(module)$allegato['id_module'])['name'], $file->id_record, $documento['descrizione']).'</td>
+                            <td>'.Modules::link(module( $allegato['id_module'])['name'], $file->id_record, $documento['descrizione']).'</td>
                             <td class="text-center">'.Translator::dateToLocale($file->created_at).'</td>
                         </tr>';
             }

@@ -108,7 +108,7 @@ echo '
 <?php
 
 // Variabili utilizzabili
-$module = module)$record['id_module']);
+$module = module($record['id_module']);
 $variables = $module->getPlaceholders($id_record);
 
 echo '

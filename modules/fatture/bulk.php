@@ -78,7 +78,7 @@ switch (post('op')) {
             delete($file);
         }
 
-        $module = module)$id_module);
+        $module = module($id_module);
 
         if ($module['name'] == 'Fatture di vendita') {
             $print_name = 'Fattura elettronica di vendita';
