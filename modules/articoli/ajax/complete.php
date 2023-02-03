@@ -19,6 +19,8 @@
 
 include_once __DIR__.'/../../../core.php';
 
+use Modules\Articoli\Articolo;
+
 $idarticolo = get('idarticolo');
 $limit = get('limit');
 
@@ -178,4 +180,28 @@ switch ($resource) {
         echo json_encode($results);
 
         break;
+
+    case 'getGiacenze':
+        $id_articolo = get('id_articolo');
+        $id_anagrafica = get('id_anagrafica');
+        $direzione = get('dir') == 'uscita' ? 'uscita' : 'entrata';
+
+        if (empty($id_articolo) || empty($id_anagrafica)) {
+            return;
+        }
+
+        $articolo = Articolo::find($id_articolo);
+        $giacenze = $articolo->getGiacenze();
+        $sedi = $dbo->fetchArray('(SELECT "0" AS id, IF(indirizzo!=\'\', CONCAT_WS(" - ", "'.tr('Sede legale').'", CONCAT(citta, \' (\', indirizzo, \')\')), CONCAT_WS(" - ", "'.tr('Sede legale').'", citta)) AS nomesede FROM an_anagrafiche WHERE idanagrafica = '.prepare(setting('Azienda predefinita')).') UNION (SELECT id, IF(indirizzo!=\'\',CONCAT_WS(" - ", nomesede, CONCAT(citta, \' (\', indirizzo, \')\')), CONCAT_WS(" - ", nomesede, citta )) AS nomesede FROM an_sedi WHERE idanagrafica='.prepare(setting('Azienda predefinita')).')');
+
+        $results = [
+            'articolo' => $articolo,
+            'giacenze' => $giacenze,
+            'sedi' => $sedi,
+        ];
+
+        echo json_encode($results);
+
+        break;
 }
+

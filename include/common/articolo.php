@@ -21,6 +21,8 @@ $result['idarticolo'] = isset($result['idarticolo']) ? $result['idarticolo'] : n
 $qta_minima = 0;
 $id_listino = $dbo->selectOne('an_anagrafiche', 'id_listino', ['idanagrafica' => $options['idanagrafica']])['id_listino'];
 
+$module_articoli_id = Modules::get('Articoli')['id'];
+
 // Articolo
 if (empty($result['idarticolo'])) {
     // Sede partenza
@@ -66,6 +68,27 @@ if (empty($result['idarticolo'])) {
         });
     </script>';
 }
+
+//giacenze
+echo
+'<div class="row">
+    <div class="col-md-12">
+        <label for="tbl_giacenze">' . tr('Giacenze') . '</label>
+        <table id="tbl_giacenze" class="table table-striped table-condensed table-bordered">
+            <thead>
+                <tr>
+                    <th>'.tr('Sede').'</th>
+                    <th width="20%" class="text-center">'.tr('Q.tà').'</th>
+                    <th width="5%" class="text-center">#</th>
+                </tr>
+            </thead>
+            <tbody>
+                <td colspan="3" class="text-center">' . tr('Nessuna giacenza disponibile') . '</td>
+            </tbody>
+        </table>
+    </div>
+</div>';
+
 
 echo '
     <input type="hidden" name="qta_minima" id="qta_minima" value="'.$qta_minima.'">
@@ -176,19 +199,19 @@ $("#idarticolo").on("change", function() {
                 $("#idiva").selectSetNew($data.idiva_vendita, $data.iva_vendita, {"percentuale": $data.percentuale});
             }
         }
-    
+
         else {
             $("#id_dettaglio_fornitore").val($data.id_dettaglio_fornitore);
             $("#qta_minima").val($data.qta_minima);
             aggiornaQtaMinima();
         }
-    
+
         let id_conto = $data.idconto_'.($options['dir'] == 'entrata' ? 'vendita' : 'acquisto').';
         let id_conto_title = $data.idconto_'.($options['dir'] == 'entrata' ? 'vendita' : 'acquisto').'_title;
         if(id_conto) {
             $("#idconto").selectSetNew(id_conto, id_conto_title);
         }
-    
+
         $("#um").selectSetNew($data.um, $data.um);
 
         if ($data.provvigione) {
@@ -199,6 +222,10 @@ $("#idarticolo").on("change", function() {
             input("tipo_provvigione").set(input("tipo_provvigione_default").get());
         }
     });
+
+    getGiacenzeArticoloPerSede($data.id);
+
+    getDatiVenditaArticolo($data.id);
 });
 
 $("#idsede").on("change", function() {
@@ -212,6 +239,90 @@ $(document).on("change", "input[name^=qta], input[name^=prezzo_unitario], input[
     verificaScontoArticolo();
     verificaMinimoVendita();
 });
+
+/**
+ * Restituisce le giacenze dell\'articolo per ogni sede e le mostra in tabella
+ */
+function getGiacenzeArticoloPerSede(id_articolo) {
+    $.get(
+        globals.rootdir + "/ajax_complete.php?module=Articoli&op=getGiacenze&id_anagrafica=' . $options['idanagrafica'] . '&id_articolo=" + id_articolo + "&dir=" + direzione,
+        function(response) {
+            const data = JSON.parse(response);
+
+            var sedi = data.sedi;
+            var giacenze = data.giacenze;
+            var articolo = data.articolo;
+
+            var html = "";
+            for (var i = 0; i < sedi.length; i++) {
+                var sede = sedi[i];
+
+                if (giacenze[sede["id"]] !== undefined) {
+                    html +=
+                        "<tr>" +
+                            "<td>" + sede.nomesede + "</td>" +
+                            "<td>" + giacenze[sede["id"]][0] + " " + articolo.um + "</td>" +
+                            "<td class=\"text-center\">" +
+                                "<a class=\"btn btn-xs btn-info\" title=\"Dettagli\" onclick=\"getDettagli(" + sede["id"] + ", " + id_articolo + ");\">" +
+                                    "<i class=\"fa fa-eye\"></i>" +
+                                "</a>" +
+                            "</td>" +
+                        "</tr>";
+                }
+            }
+
+            if (html == "") {
+                html = "<tr><td colspan=\"3\" class=\"text-center\">" + "' . tr('Nessuna giacenza disponibile') . '" + "</td></tr>";
+            }
+
+            $("#tbl_giacenze tbody").html(html);
+        }
+    );
+}
+
+function getDatiVenditaArticolo(id_articolo) {
+    $.get(
+        globals.rootdir + "/ajax_complete.php?module=Articoli&op=getDatiVendita&id_anagrafica=' . $options['idanagrafica'] . '&id_articolo=" + id_articolo + "&dir=" + direzione,
+        function(response) {
+            const data = JSON.parse(response);
+
+            var datiVendita = data.datiVendita;
+
+            var html = "";
+            for (var i = 0; i < datiVendita.length; i++) {
+                var venditaMese = datiVendita[i];
+
+                if (venditaMese.data[0] !== undefined) {
+                    if (venditaMese.data.length > 0) {
+                        html +=
+                            "<tr>" +
+                                "<td>" + venditaMese.mese + " - " + venditaMese.anno + "</td>" +
+                                "<td>" + parseFloat(venditaMese.data[0].qta).toFixed(2) + " " + venditaMese.data[0].um + "</td>" +
+                                "<td>" + parseFloat(venditaMese.data[0].totale).toFixed(2) + "</td>" +
+                            "</tr>";
+                    }
+                }
+            }
+
+            if (html == "") {
+                html = "<tr><td colspan=\"3\" class=\"text-center\">" + "' . tr('Nessuna vendita') . '" + "</td></tr>";
+            }
+
+            $("#tbl_vendite tbody").html(html);
+        }
+    );
+}
+
+/**
+ * Apre la modal per il dettaglio della sede.
+ */
+function getDettagli(id_sede, id_articolo) {
+    // Apertura modal
+    openModal(
+        "' . tr('Dettagli') . '",
+        globals.rootdir + "/modules/articoli/plugins/dettagli_giacenze.php?id_module=' . $module_articoli_id . '&id_record=" + id_articolo + "&idsede=" + id_sede
+    );
+}
 
 /**
 * Restituisce il dettaglio registrato per una specifica quantità dell\'articolo.
@@ -318,7 +429,7 @@ function getPrezziListinoVisibili(nome = "") {
                     dettaglio_prezzi_visibili = parseFloat(dettaglio.prezzo_unitario_listino_visibile);
                     continue;
                 }
-            } else {                
+            } else {
                 dettaglio_prezzi_visibili.push(dettaglio);
             }
         }
@@ -408,7 +519,7 @@ function verificaPrezzoArticolo() {
     }
     let table = $(".table-prezzi");
 
-    if (prezzo_anagrafica) { 
+    if (prezzo_anagrafica) {
         table.append(`<tr><td class="pr_anagrafica"><small>'.($options['dir'] == 'uscita' ? tr('Prezzo listino') : tr('Netto cliente')).': '.Plugins::link(($options['dir'] == 'uscita' ? 'Listino Fornitori' : 'Netto Clienti'), $result['idarticolo'], tr('Visualizza'), null, '').'</small></td><td align="right" class="pr_anagrafica"><small>` + prezzo_anagrafica.toLocale() + ` ` + globals.currency + `</small></td>`);
 
         let tr = $(".pr_anagrafica").parent();
@@ -554,7 +665,7 @@ function aggiornaPrezzoArticolo(aggiorna = "") {
         prezzo3 = getPrezzoScheda();
         prezzo_previsto = (!prezzo1 ? prezzo2 : (!prezzo2 ? prezzo1 : (prezzo1 > prezzo2 ? prezzo2 : prezzo1)));
         prezzo_previsto = (prezzo_previsto ? prezzo_previsto : prezzo3);
-    } 
+    }
 
     $("#prezzo_unitario").val(prezzo_previsto).trigger("change");
     $("#sconto").val(0).trigger("change");
@@ -642,7 +753,7 @@ function verificaMinimoVendita() {
         if (input("blocca_minimo_vendita").get() == "1") {
             prezzo_unitario_input.val(minimo_vendita);
             div.html(`<p class="label-warning">'.tr('Attenzione:<br>non è possibile inserire un prezzo inferiore al prezzo minimo di vendita ').'` + minimo_vendita.toLocale() + ` ` + globals.currency + `</p>`);
-        } 
+        }
     }
 }
 </script>';
