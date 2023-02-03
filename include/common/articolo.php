@@ -199,6 +199,8 @@ $("#idarticolo").on("change", function() {
             input("tipo_provvigione").set(input("tipo_provvigione_default").get());
         }
     });
+
+    getDatiVenditaArticolo($data.id);
 });
 
 $("#idsede").on("change", function() {
@@ -212,6 +214,39 @@ $(document).on("change", "input[name^=qta], input[name^=prezzo_unitario], input[
     verificaScontoArticolo();
     verificaMinimoVendita();
 });
+
+function getDatiVenditaArticolo(id_articolo) {
+    $.get(
+        globals.rootdir + "/ajax_complete.php?module=Articoli&op=getDatiVendita&id_anagrafica=' . $options['idanagrafica'] . '&id_articolo=" + id_articolo + "&dir=" + direzione,
+        function(response) {
+            const data = JSON.parse(response);
+
+            var datiVendita = data.datiVendita;
+
+            var html = "";
+            for (var i = 0; i < datiVendita.length; i++) {
+                var venditaMese = datiVendita[i];
+
+                if (venditaMese.data[0] !== undefined) {
+                    if (venditaMese.data.length > 0) {
+                        html +=
+                            "<tr>" +
+                                "<td>" + venditaMese.mese + " - " + venditaMese.anno + "</td>" +
+                                "<td>" + parseFloat(venditaMese.data[0].qta).toFixed(2) + " " + venditaMese.data[0].um + "</td>" +
+                                "<td>" + parseFloat(venditaMese.data[0].totale).toFixed(2) + "</td>" +
+                            "</tr>";
+                    }
+                }
+            }
+
+            if (html == "") {
+                html = "<tr><td colspan=\"3\" class=\"text-center\">" + "' . tr('Nessuna vendita') . '" + "</td></tr>";
+            }
+
+            $("#tbl_vendite tbody").html(html);
+        }
+    );
+}
 
 /**
 * Restituisce il dettaglio registrato per una specifica quantità dell\'articolo.
