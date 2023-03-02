@@ -155,11 +155,11 @@ foreach ($righe as $riga) {
         // Prezzi unitari
         echo '
                 <td class="text-right">';
-                    // Provvigione riga 
+                    // Provvigione riga
                     if (abs($riga->provvigione_unitaria) > 0) {
                         $text = provvigioneInfo($riga);
                         echo '<span class="pull-left text-info" title="'.$text.'"><i class="fa fa-handshake-o"></i></span>';
-                    } 
+                    }
                     echo moneyFormat($riga->prezzo_unitario_corrente);
 
         if ($dir == 'entrata' && $riga->costo_unitario != 0) {
@@ -178,7 +178,7 @@ foreach ($righe as $riga) {
 
         echo '
                 </td>';
-                
+
         // Sconto unitario
         if (!$block_edit) {
             echo '
@@ -357,7 +357,7 @@ if(!empty($ddt->provvigione)) {
             '.moneyFormat($ddt->totale_imponibile - $ddt->provvigione).'
         </td>
         <td></td>
-    </tr>';	
+    </tr>';
 }
 
 echo '
@@ -371,6 +371,10 @@ if (!$block_edit && sizeof($righe) > 0) {
 
         <button type="button" class="btn btn-xs btn-default disabled" id="elimina_righe" onclick="rimuoviRiga(getSelectData());">
             <i class="fa fa-trash"></i>
+        </button>
+
+        <button type="button" class="btn btn-xs btn-default disabled" id="subtotale_righe" onclick="calcolaSubtotale(\'ddt\');">
+            <i class="fa fa-calculator"></i> Subtotale
         </button>
     </div>';
 }
@@ -397,7 +401,7 @@ async function modificaRiga(button) {
 // Estraggo le righe spuntate
 function getSelectData() {
     let data=new Array();
-    $(\'#righe\').find(\'.check:checked\').each(function (){ 
+    $(\'#righe\').find(\'.check:checked\').each(function (){
         data.push($(this).closest(\'tr\').data(\'id\'));
     });
 
@@ -506,13 +510,15 @@ $(".check").on("change", function() {
     if (checked) {
         $("#elimina_righe").removeClass("disabled");
         $("#duplica_righe").removeClass("disabled");
+        $("#subtotale_righe").removeClass("disabled");
     } else {
         $("#elimina_righe").addClass("disabled");
         $("#duplica_righe").addClass("disabled");
+        $("#subtotale_righe").addClass("disabled");
     }
 });
 
-$("#check_all").click(function(){    
+$("#check_all").click(function(){
     if( $(this).is(":checked") ){
         $(".check").each(function(){
             if( !$(this).is(":checked") ){
