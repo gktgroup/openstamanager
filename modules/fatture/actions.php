@@ -19,7 +19,6 @@
 
 include_once __DIR__.'/../../core.php';
 
-use Carbon\Carbon;
 use Modules\Anagrafiche\Anagrafica;
 use Modules\Anagrafiche\Tipo as TipoAnagrafica;
 use Modules\Articoli\Articolo as ArticoloOriginale;
@@ -95,6 +94,8 @@ switch (post('op')) {
         } else {
             $fattura->data_registrazione = post('data_registrazione');
         }
+
+        $fattura->data_competenza = post('data_competenza');
 
         $fattura->numero_esterno = post('numero_esterno');
         $fattura->note = post('note');
@@ -264,7 +265,7 @@ switch (post('op')) {
             'stored' => round($totale_documento,2),
             'calculated' => round($fattura->totale,2),
         ]);
-        
+
         break;
 
     // Elenco fatture in stato Bozza per il cliente
@@ -660,7 +661,7 @@ switch (post('op')) {
     // Scollegamento riga generica da documento
     case 'delete_riga':
         $id_righe = (array)post('righe');
-        
+
         foreach ($id_righe as $id_riga) {
             $riga = Articolo::find($id_riga) ?: Riga::find($id_riga);
             $riga = $riga ?: Descrizione::find($id_riga);
@@ -685,7 +686,7 @@ switch (post('op')) {
     // Duplicazione riga
     case 'copy_riga':
         $id_righe = (array)post('righe');
-        
+
         foreach ($id_righe as $id_riga) {
             $riga = Articolo::find($id_riga) ?: Riga::find($id_riga);
             $riga = $riga ?: Descrizione::find($id_riga);
@@ -924,11 +925,11 @@ switch (post('op')) {
 
         break;
 
-    case 'controlla_serial': 
+    case 'controlla_serial':
         $has_serial = $dbo->fetchOne('SELECT id FROM mg_prodotti WHERE serial='.prepare(post('serial')).' AND dir="uscita" AND id_articolo='.prepare(post('id_articolo')).' AND (id_riga_documento IS NOT NULL OR id_riga_ordine IS NOT NULL OR id_riga_ddt IS NOT NULL)')['id'];
-        
+
         echo json_encode($has_serial);
-        
+
         break;
 
     case 'add_articolo':
@@ -964,7 +965,7 @@ switch (post('op')) {
                     $id_conto = $originale->idconto_acquisto;
                 }
                 $articolo->idconto = $id_conto;
-                
+
                 if ($dir == 'entrata') {
                     if ($fattura->anagrafica['idiva_vendite'] ? $id_iva = $fattura->anagrafica['idiva_vendite'] : $id_iva = $originale->idiva_vendita ?: setting('Iva predefinita'));
                 } else {
@@ -972,7 +973,7 @@ switch (post('op')) {
                 }
                 $id_anagrafica = $fattura->idanagrafica;
                 $prezzi_ivati = setting('Utilizza prezzi di vendita comprensivi di IVA');
-        
+
                 // CALCOLO PREZZO UNITARIO
                 $prezzo_unitario = 0;
                 $sconto = 0;
@@ -995,7 +996,7 @@ switch (post('op')) {
                             continue;
                         }
                     }
-                } 
+                }
                 if (empty($prezzo_unitario)) {
                     // Prezzi listini clienti
                     $listino = $dbo->fetchOne('SELECT sconto_percentuale AS sconto_percentuale_listino, '.($prezzi_ivati ? 'prezzo_unitario_ivato' : 'prezzo_unitario').' AS prezzo_unitario_listino
@@ -1017,7 +1018,7 @@ switch (post('op')) {
                 $articolo->setProvvigione($provvigione ?: 0, 'PRC');
                 $articolo->save();
 
-                
+
                 flash()->info(tr('Nuovo articolo aggiunto!'));
             }
         } else {
@@ -1026,6 +1027,19 @@ switch (post('op')) {
         }
 
         break;
+
+    case 'edit-price':
+        $righe = $post['righe'];
+
+        foreach ($righe as $riga) {
+            $dbo->query(
+                'UPDATE co_righe_documenti
+                SET prezzo_unitario = '.$riga['price'].'
+                WHERE id = '.$riga['id']
+            );
+        }
+
+        flash()->info(tr('Prezzi aggiornati!'));
 }
 
 // Nota di debito

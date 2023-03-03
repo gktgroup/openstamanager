@@ -332,7 +332,7 @@ switch (post('op')) {
     // Scollegamento riga generica da ordine
     case 'delete_riga':
         $id_righe = (array)post('righe');
-        
+
         foreach ($id_righe as $id_riga) {
             $riga = Articolo::find($id_riga) ?: Riga::find($id_riga);
             $riga = $riga ?: Descrizione::find($id_riga);
@@ -356,7 +356,7 @@ switch (post('op')) {
     // Duplicazione riga
     case 'copy_riga':
         $id_righe = (array)post('righe');
-        
+
         foreach ($id_righe as $id_riga) {
             $riga = Articolo::find($id_riga) ?: Riga::find($id_riga);
             $riga = $riga ?: Descrizione::find($id_riga);
@@ -637,7 +637,7 @@ switch (post('op')) {
                 $id_iva = $originale->idiva_vendita ?: setting('Iva predefinita');
                 $id_anagrafica = $ordine->idanagrafica;
                 $prezzi_ivati = setting('Utilizza prezzi di vendita comprensivi di IVA');
-        
+
                 // CALCOLO PREZZO UNITARIO
                 $prezzo_unitario = 0;
                 $sconto = 0;
@@ -660,7 +660,7 @@ switch (post('op')) {
                             continue;
                         }
                     }
-                } 
+                }
                 if (empty($prezzo_unitario)) {
                     // Prezzi listini clienti
                     $listino = $dbo->fetchOne('SELECT sconto_percentuale AS sconto_percentuale_listino, '.($prezzi_ivati ? 'prezzo_unitario_ivato' : 'prezzo_unitario').' AS prezzo_unitario_listino
@@ -682,7 +682,7 @@ switch (post('op')) {
                 $articolo->setProvvigione($provvigione ?: 0, 'PRC');
                 $articolo->save();
 
-                
+
                 flash()->info(tr('Nuovo articolo aggiunto!'));
             }
         } else {
@@ -704,6 +704,21 @@ switch (post('op')) {
 
             flash()->info(tr('Quantità aggiornata!'));
         }
+
+        break;
+
+    case 'edit-price':
+        $righe = $post['righe'];
+
+        foreach ($righe as $riga) {
+            $dbo->query(
+                'UPDATE or_righe_ordini
+                SET prezzo_unitario = '.$riga['price'].'
+                WHERE id = '.$riga['id']
+            );
+        }
+
+        flash()->info(tr('Prezzi aggiornati!'));
 
         break;
 }

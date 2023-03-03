@@ -120,7 +120,7 @@ foreach ($righe as $riga) {
                         '_COD_FOR_' => $codice_fornitore,
                     ]).'</small>';
             }
-        }   
+        }
     } else {
         echo nl2br($riga->descrizione);
     }
@@ -207,11 +207,11 @@ foreach ($righe as $riga) {
         // Prezzi unitari
         echo '
                 <td class="text-right">';
-                // Provvigione riga 
+                // Provvigione riga
                 if (abs($riga->provvigione_unitaria) > 0) {
                     $text = provvigioneInfo($riga);
                     echo '<span class="pull-left text-info" title="'.$text.'"><i class="fa fa-handshake-o"></i></span>';
-                } 
+                }
                 echo moneyFormat($riga->prezzo_unitario_corrente);
 
         if (abs($riga->sconto_unitario) > 0) {
@@ -417,7 +417,16 @@ if (!$block_edit && sizeof($righe) > 0) {
         <button type="button" class="btn btn-xs btn-default disabled" id="elimina_righe" onclick="rimuoviRiga(getSelectData());">
             <i class="fa fa-trash"></i>
         </button>
+
+        <button type="button" class="btn btn-xs btn-default disabled" id="subtotale_righe" onclick="calcolaSubtotale(\'ordini\');">
+            <i class="fa fa-calculator"></i> Subtotale
+        </button>
+
+        <button type="button" class="btn btn-xs btn-default disabled" id="confronta_righe" onclick="confrontaRighe(getSelectData());">
+            Confronta prezzi
+        </button>
     </div>';
+
 }
 echo '
 </div>
@@ -442,11 +451,15 @@ async function modificaRiga(button) {
 // Estraggo le righe spuntate
 function getSelectData() {
     let data=new Array();
-    $(\'#righe\').find(\'.check:checked\').each(function (){ 
+    $(\'#righe\').find(\'.check:checked\').each(function (){
         data.push($(this).closest(\'tr\').data(\'id\'));
     });
 
     return data;
+}
+
+function confrontaRighe(id) {
+    openModal("'.tr('Confronta prezzi').'", "'.$module->fileurl('modals/confronta_righe.php').'?id_module=" + globals.id_module + "&id_record=" + globals.id_record + "&righe=" + id + "&id_anagrafica='.$ordine->idanagrafica.'&direzione='.$dir.'");
 }
 
 function rimuoviRiga(id) {
@@ -551,13 +564,17 @@ $(".check").on("change", function() {
     if (checked) {
         $("#elimina_righe").removeClass("disabled");
         $("#duplica_righe").removeClass("disabled");
+        $("#subtotale_righe").removeClass("disabled");
+        $("#confronta_righe").removeClass("disabled");
     } else {
         $("#elimina_righe").addClass("disabled");
         $("#duplica_righe").addClass("disabled");
+        $("#subtotale_righe").addClass("disabled");
+        $("#confronta_righe").addClass("disabled");
     }
 });
 
-$("#check_all").click(function(){    
+$("#check_all").click(function(){
     if( $(this).is(":checked") ){
         $(".check").each(function(){
             if( !$(this).is(":checked") ){
