@@ -144,7 +144,7 @@ echo '
 
             <div class="row">
 				<div class="col-md-12">
-                    <?php    
+                    <?php
                     echo input([
                         'type' => 'ckeditor',
                         'use_full_ckeditor' => 0,
@@ -155,7 +155,7 @@ echo '
 					?>
                 </div>
 			</div>
-            
+
 			<div class="row">
 				<div class="col-md-12">
 					{[ "type": "textarea", "label": "<?php echo tr('Note'); ?>", "name": "note", "value": "$note$" ]}
@@ -252,7 +252,7 @@ if (!$block_edit) {
                     <button title="'.tr('Aggiungi articolo alla vendita').'" class="btn btn-primary tip" type="button" onclick="salvaArticolo()">
                         <i class="fa fa-plus"></i> '.tr('Aggiungi').'
                     </button>
-                    
+
                     <a class="btn btn-primary" onclick="gestioneRiga(this)" data-title="'.tr('Aggiungi riga').'">
                         <i class="fa fa-plus"></i> '.tr('Riga').'
                     </a>
@@ -304,7 +304,12 @@ echo '
 			<div class="col-md-12" id="righe"></div>
 		</div>
 	</div>
-</div>
+</div>';
+
+$module_anagrafica_id = Modules::get('Anagrafiche')['id'];
+
+echo '
+{( "name": "filelist_and_upload", "id_module": "'.$module_anagrafica_id.'", "id_record": "'.$record['idanagrafica'].'", "readonly": "1", "title": "Allegati anagrafica")}
 
 {( "name": "filelist_and_upload", "id_module": "$id_module$", "id_record": "$id_record$" )}
 
@@ -366,7 +371,7 @@ $("#idanagrafica").change(function() {
 
 	$("#idsede").selectReset();
     $("#idpagamento").selectReset();
-    
+
     let data = $(this).selectData();
 	if (data) {
         // Impostazione del tipo di pagamento da anagrafica

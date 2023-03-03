@@ -164,7 +164,7 @@ echo '
 
             <div class="row">
 				<div class="col-md-12">
-                    <?php    
+                    <?php
                     echo input([
                         'type' => 'ckeditor',
                         'use_full_ckeditor' => 1,
@@ -208,7 +208,7 @@ echo '
     <div class="box box-primary collapsable  <?php echo ($record['tipo_anagrafica'] == 'Ente pubblico' || $record['tipo_anagrafica'] == 'Azienda') ? 'show' : 'hide'; ?> <?php echo $collapsed; ?>">
         <div class=" box-header">
             <h4 class=" box-title">
-                
+
                 <?php echo tr('Dati appalto'); ?></h4>
 
                 <div class="box-tools pull-right">
@@ -216,7 +216,7 @@ echo '
                     <i class="fa fa-plus"></i>
                     </button>
                 </div>
-            
+
         </div>
         <div class="box-body">
             <div class="row">
@@ -272,7 +272,7 @@ if (!$block_edit) {
                     <button title="'.tr('Aggiungi articolo alla vendita').'" class="btn btn-primary tip" type="button" onclick="salvaArticolo()">
                         <i class="fa fa-plus"></i> '.tr('Aggiungi').'
                     </button>
-                    
+
                     <a class="btn btn-primary" onclick="gestioneRiga(this)" data-title="'.tr('Aggiungi riga').'">
                         <i class="fa fa-plus"></i> '.tr('Riga').'
                     </a>
@@ -310,7 +310,12 @@ echo '
 			<div class="col-md-12" id="righe"></div>
 		</div>
     </div>
-</div>
+</div>';
+
+$module_anagrafica_id = Modules::get('Anagrafiche')['id'];
+
+echo '
+{( "name": "filelist_and_upload", "id_module": "'.$module_anagrafica_id.'", "id_record": "'.$record['idanagrafica'].'", "readonly": "1", "title": "Allegati anagrafica")}
 
 {( "name": "filelist_and_upload", "id_module": "$id_module$", "id_record": "$id_record$" )}
 
@@ -363,7 +368,7 @@ function caricaRighe(id_riga) {
 
 $(document).ready(function() {
     caricaRighe(null);
-    
+
     $("#idanagrafica").change(function() {
         updateSelectOption("idanagrafica", $(this).val());
         session_set("superselect,idanagrafica", $(this).val(), 0);
