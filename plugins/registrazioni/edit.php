@@ -20,9 +20,9 @@
 use Modules\Interventi\Intervento;
 
 if ( $id_module == Modules::get('Fatture di acquisto')['id'] ){
-    $conti = 'conti-acquisti-totali';
+    $conti = 'conti-acquisti';
 } else{
-    $conti = 'conti-vendite-totali';
+    $conti = 'conti-vendite';
 }
 
 echo '
